@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/auth';
 
 export default function AuthCallbackPage() {
@@ -12,6 +11,20 @@ export default function AuthCallbackPage() {
   useEffect(() => {
     const handleCallback = async () => {
       try {
+        // Dynamically import supabase on the client to avoid server-side instantiation
+        const { createClient } = await import('@supabase/supabase-js');
+
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
+        const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string;
+
+        if (!supabaseUrl || !supabaseAnonKey) {
+          console.error('Missing Supabase env vars in client');
+          router.push('/login?error=Auth not configured');
+          return;
+        }
+
+        const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
         // Get session from URL hash
         const { data, error } = await supabase.auth.getSession();
 
