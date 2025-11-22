@@ -55,7 +55,7 @@ export function StatCard({ label, value, icon, color = 'blue', trend, className 
             </p>
           )}
         </div>
-        {icon && <div className={`${colors.icon} text-4xl opacity-20`}>{icon}</div>}
+        {icon && <div className={`${colors.icon} text-4xl opacity-20`}>{icon as React.ReactNode}</div>}
       </div>
     </Card>
   );

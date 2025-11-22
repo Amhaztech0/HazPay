@@ -141,10 +141,10 @@ export default function DashboardPage() {
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard label="Total Revenue" value={stats.totalRevenue} icon={CreditCard} color="#3b82f6" />
-        <StatCard label="Total Profit" value={stats.totalProfit} icon={TrendingUp} color="#10b981" />
-        <StatCard label="Transactions" value={stats.totalTransactions} icon={CreditCard} color="#f59e0b" />
-        <StatCard label="Active Users" value={stats.activeUsers} icon={Users} color="#8b5cf6" />
+        <StatCard label="Total Revenue" value={stats.totalRevenue} icon={<CreditCard size={32} />} color="blue" />
+        <StatCard label="Total Profit" value={stats.totalProfit} icon={<TrendingUp size={32} />} color="green" />
+        <StatCard label="Transactions" value={stats.totalTransactions} icon={<Wallet size={32} />} color="amber" />
+        <StatCard label="Active Users" value={stats.activeUsers} icon={<Users size={32} />} color="purple" />
       </div>
 
       {/* Today's Metrics */}
