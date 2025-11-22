@@ -41,14 +41,12 @@ export function ProtectedLayout({ children }: ProtectedLayoutProps) {
     checkAuth();
 
     // Subscribe to auth changes
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (!session) {
-          setUser(null);
-          router.push('/login');
-        }
+    const { data: listener } = supabase.auth.onAuthStateChange((event: any, session: any) => {
+      if (!session) {
+        setUser(null);
+        router.push('/login');
       }
-    );
+    });
 
     return () => {
       listener?.subscription.unsubscribe();
