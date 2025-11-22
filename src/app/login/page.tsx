@@ -19,7 +19,7 @@ export default function LoginPage() {
   // If a magic link redirected back with an access token in the URL, parse and store it
   useEffect(() => {
     // Subscribe to auth events. This will catch session changes after magic link redirect.
-    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: listener } = supabase.auth.onAuthStateChange((event: any, session: any) => {
       if (session) {
         setUser({ id: session.user.id, email: session.user.email || '', role: 'admin' });
         router.push('/dashboard');
