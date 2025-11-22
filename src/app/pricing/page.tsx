@@ -62,7 +62,7 @@ export default function PricingPage() {
         .update({
           sell_price: sell,
           cost_price: cost,
-        })
+        } as any)
         .eq('id', editingId);
 
       if (updateError) throw updateError;
