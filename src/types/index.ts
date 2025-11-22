@@ -46,6 +46,19 @@ export interface User {
   last_login?: string;
 }
 
+export interface Loan {
+  id: string;
+  user_id: string;
+  user_email?: string;
+  user_name?: string;
+  amount: number;
+  status: 'pending' | 'approved' | 'active' | 'repaid' | 'defaulted';
+  issued_date: string;
+  repaid_date?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface DailySalesMetric {
   date: string;
   sales: number;

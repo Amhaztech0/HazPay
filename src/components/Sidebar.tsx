@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Wallet, Settings, LogOut, TrendingUp, Users, FileText } from 'lucide-react';
+import { LayoutDashboard, Wallet, Settings, LogOut, TrendingUp, Users, FileText, DollarSign } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/auth';
 
@@ -16,6 +16,7 @@ export function Sidebar() {
     { href: '/transactions', label: 'Transactions', icon: TrendingUp },
     { href: '/pricing', label: 'Pricing', icon: Settings },
     { href: '/wallets', label: 'Wallets', icon: Wallet },
+    { href: '/loans', label: 'Loans', icon: DollarSign },
     { href: '/users', label: 'Users', icon: Users },
     { href: '/reports', label: 'Reports', icon: FileText },
   ];
