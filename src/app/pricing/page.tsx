@@ -57,12 +57,12 @@ export default function PricingPage() {
       const sell = Number(editValues.sell_price);
       const cost = Number(editValues.cost_price);
 
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from('pricing')
         .update({
           sell_price: sell,
           cost_price: cost,
-        } as any)
+        })
         .eq('id', editingId);
 
       if (updateError) throw updateError;
