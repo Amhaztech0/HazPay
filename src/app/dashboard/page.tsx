@@ -3,8 +3,9 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { TrendingUp, Users, Wallet, CreditCard } from 'lucide-react';
+import { TrendingUp, Users, Wallet, CreditCard, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { DailySalesMetric, Transaction } from '@/types';
+import { Card, StatCard } from '@/components/ui/Card';
 
 interface DashboardStats {
   totalRevenue: number;
@@ -27,7 +28,7 @@ export default function DashboardPage() {
     todayProfit: 0,
   });
   const [salesData, setSalesData] = useState<DailySalesMetric[]>([]);
-  const [networkData, setNetworkData] = useState<any[]>([]);
+  const [networkData, setNetworkData] = useState<Array<{ name: string; value: number }>>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -126,18 +127,8 @@ export default function DashboardPage() {
     );
   }
 
-  const StatCard = ({ label, value, icon: Icon, color }: any) => (
-    <div className="bg-white rounded-lg shadow p-6 border-l-4" style={{ borderColor: color }}>
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-gray-600 text-sm font-medium">{label}</p>
-          <p className="text-3xl font-bold text-gray-900 mt-2">
-            {typeof value === 'number' && label.includes('₦') ? `₦${value.toLocaleString()}` : value.toLocaleString()}
-          </p>
-        </div>
-        <Icon size={32} style={{ color }} className="opacity-20" />
-      </div>
-    </div>
+  const StatCardComponent = ({ label, value, icon: Icon, color }: { label: string; value: string | number; icon: React.ComponentType<any>; color: 'blue' | 'green' | 'amber' | 'purple' }) => (
+    <StatCard label={label} value={value} icon={<Icon size={32} />} color={color} />
   );
 
   return (
