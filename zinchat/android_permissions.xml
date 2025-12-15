@@ -1,0 +1,31 @@
+<!-- 
+  Add these permissions to android/app/src/main/AndroidManifest.xml
+  Place them inside the <manifest> tag, before <application>
+-->
+
+<!-- Camera permission for video calls -->
+<uses-permission android:name="android.permission.CAMERA" />
+
+<!-- Microphone permission for audio/video calls -->
+<uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+<!-- Internet permission (usually already present) -->
+<uses-permission android:name="android.permission.INTERNET" />
+
+<!-- Audio settings for call quality -->
+<uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
+<!-- Network state for connection monitoring -->
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+<!-- Bluetooth for audio routing (optional) -->
+<uses-permission android:name="android.permission.BLUETOOTH" />
+<uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+
+<!-- Wake lock to keep screen on during calls (optional) -->
+<uses-permission android:name="android.permission.WAKE_LOCK" />
+
+<!-- Feature declarations -->
+<uses-feature android:name="android.hardware.camera" android:required="false" />
+<uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+<uses-feature android:name="android.hardware.microphone" android:required="true" />

@@ -1,0 +1,80 @@
+Launching lib\main.dart on Pixel 7 Pro in debug mode...
+Running Gradle task 'assembleDebug'...                          
+lib/widgets/chat_tile.dart:88:27: Error: Can't find ')' to match '('.
+    return AnimatedBuilder(
+                          ^
+lib/widgets/chat_tile.dart:307:7: Error: Expected a class member, but got 'catch'.
+    } catch (e, st) {
+      ^^^^^
+lib/widgets/chat_tile.dart:307:13: Error: Expected an identifier, but got '('.
+Try inserting an identifier before '('.
+    } catch (e, st) {
+            ^
+lib/widgets/chat_tile.dart:342:1: Error: Expected a declaration, but got '}'.
+}
+^
+lib/widgets/chat_tile.dart:286:11: Error: Expected ',' before this.
+        } catch (e, st) {
+          ^^^^^
+lib/widgets/chat_tile.dart:286:11: Error: 'catch' can't be used as an identifier because it's a keyword.
+Try renaming this to be an identifier that isn't a keyword.
+        } catch (e, st) {
+          ^^^^^
+lib/widgets/chat_tile.dart:286:25: Error: Expected ',' before this.
+        } catch (e, st) {
+                        ^
+lib/widgets/chat_tile.dart:287:65: Error: Expected '}' before this.
+          debugPrint('Γ¥î ChatTile _buildChatTile item error: $e');
+                                                                ^
+lib/widgets/chat_tile.dart:88:27: Error: Too many positional arguments: 0 allowed, but 2 found.
+Try removing the extra positional arguments.
+    return AnimatedBuilder(
+                          ^
+/C:/flutter/packages/flutter/lib/src/widgets/transitions.dart:1203:9: Context: Found this candidate, but the arguments don't match.
+  const AnimatedBuilder({
+        ^^^^^^^^^^^^^^^
+lib/widgets/chat_tile.dart:304:9: Error: Expected ';' after this.
+        }
+        ^
+lib/widgets/chat_tile.dart:84:5: Error: A try block must be followed by an 'on', 'catch', or 'finally' clause.
+Try adding either a catch or finally clause, or remove the try statement.
+    try {
+    ^^^
+lib/widgets/chat_tile.dart:305:8: Error: Expected an identifier, but got ','.
+Try inserting an identifier before ','.
+      },
+       ^
+lib/widgets/chat_tile.dart:305:7: Error: Expected ';' after this.
+      },
+      ^
+lib/widgets/chat_tile.dart:305:8: Error: Unexpected token ';'.
+      },
+       ^
+lib/widgets/chat_tile.dart:306:5: Error: Expected an identifier, but got ')'.
+Try inserting an identifier before ')'.
+    );
+    ^
+lib/widgets/chat_tile.dart:305:8: Error: Expected ';' after this.
+      },
+       ^
+lib/widgets/chat_tile.dart:306:5: Error: Unexpected token ';'.
+    );
+    ^
+Target kernel_snapshot_program failed: Exception
+
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileFlutterBuildDebug'.
+> Process 'command 'C:\flutter\bin\flutter.bat'' finished with non-zero exit value 1
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 1m 52s
+Running Gradle task 'assembleDebug'...                            114.8s
+Error: Gradle task assembleDebug failed with exit code 1

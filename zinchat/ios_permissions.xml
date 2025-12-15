@@ -1,0 +1,16 @@
+<!-- 
+  Add these keys to ios/Runner/Info.plist
+  Place them inside the <dict> tag
+-->
+
+<!-- Camera permission for video calls -->
+<key>NSCameraUsageDescription</key>
+<string>We need camera access for video calls with your friends</string>
+
+<!-- Microphone permission for audio/video calls -->
+<key>NSMicrophoneUsageDescription</key>
+<string>We need microphone access for voice and video calls</string>
+
+<!-- Photo library for sharing media during calls (optional) -->
+<key>NSPhotoLibraryUsageDescription</key>
+<string>We need access to share photos during calls</string>

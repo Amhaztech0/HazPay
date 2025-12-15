@@ -1,0 +1,23 @@
+name: Execute Scheduled Server Deletions
+
+on:
+  schedule:
+    # Run every hour at the top of the hour (UTC)
+    - cron: '0 * * * *'
+  workflow_dispatch:  # Allow manual trigger from GitHub UI
+
+jobs:
+  delete-servers:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Execute server deletions
+        run: |
+          curl -X POST \
+            'https://avaewzkgsilitcrncqhe.supabase.co/functions/v1/execute_scheduled_server_deletions' \
+            -H 'Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}' \
+            -H 'Content-Type: application/json' \
+            -d '{}'
+        continue-on-error: true
+
+      - name: Log execution
+        run: echo "Server deletion check completed at $(date)"

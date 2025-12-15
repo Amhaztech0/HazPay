@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "569326505185",
+    "project_id": "zinchat-f8d78",
+    "storage_bucket": "zinchat-f8d78.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:569326505185:android:aa71ea30618e18dc027ba0",
+        "android_client_info": {
+          "package_name": "com.example.zinchat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA72FAaEU8kCXSf-3zscx49P-KmFU516W4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
