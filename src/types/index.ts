@@ -32,7 +32,7 @@ export interface DataPlan {
   cost_price: number;
   sell_price: number;
   profit: number;
-  amigo_plan_id: string;
+  payscribe_plan_id: string;
   updated_at: string;
 }
 
@@ -46,22 +46,22 @@ export interface User {
   last_login?: string;
 }
 
-export interface Loan {
-  id: string;
-  user_id: string;
-  user_email?: string;
-  user_name?: string;
-  amount: number;
-  status: 'pending' | 'approved' | 'active' | 'repaid' | 'defaulted';
-  issued_date: string;
-  repaid_date?: string;
-  created_at: string;
-  updated_at: string;
-}
-
 export interface DailySalesMetric {
   date: string;
   sales: number;
   profit: number;
   transactions: number;
+}
+
+export interface BillPayment {
+  id: string;
+  user_id: string;
+  bill_type: 'electricity' | 'cable' | 'internet' | 'airtime';
+  provider: string;
+  account_number: string;
+  amount: number;
+  status: 'pending' | 'success' | 'failed';
+  reference: string;
+  created_at: string;
+  updated_at: string;
 }

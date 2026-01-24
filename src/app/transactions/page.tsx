@@ -1,35 +1,43 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Transaction } from '@/types';
-import { Search, Download, Filter, ChevronUp, ChevronDown } from 'lucide-react';
+import { ChevronUp, ChevronDown } from 'lucide-react';
 import Papa from 'papaparse';
+import {
+  Card, EmptyState,
+  PageHeader, RefreshButton, ExportButton, FilterBar, ResultsCount,
+  SearchInput, Select, BackButton,
+  TableSkeleton, StatusCell, CurrencyCell, DateCell, Alert,
+} from '@/components/ui';
+import { formatCurrency, formatDate } from '@/lib/theme';
 
 type SortField = 'created_at' | 'amount' | 'profit' | 'status';
-type FilterNetwork = 'all' | 'MTN' | 'GLO';
+type FilterNetwork = 'all' | 'MTN' | 'GLO' | 'AIRTEL' | '9MOBILE';
+
+const NETWORK_OPTIONS = [
+  { value: 'all', label: 'All Networks' },
+  { value: 'MTN', label: 'MTN' },
+  { value: 'AIRTEL', label: 'Airtel' },
+  { value: 'GLO', label: 'Glo' },
+  { value: '9MOBILE', label: '9Mobile' },
+];
 
 export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterNetwork, setFilterNetwork] = useState<FilterNetwork>('all');
   const [sortField, setSortField] = useState<SortField>('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
-  useEffect(() => {
-    fetchTransactions();
-    const interval = setInterval(fetchTransactions, 30000); // Refresh every 30 seconds
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    applyFiltersAndSort();
-  }, [transactions, searchTerm, filterNetwork, sortField, sortOrder]);
-
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async () => {
     try {
+      setError(null);
       const { data, error } = await supabase
         .from('hazpay_transactions')
         .select('*')
@@ -38,12 +46,24 @@ export default function TransactionsPage() {
 
       if (error) throw error;
       setTransactions(data || []);
-    } catch (error) {
-      console.error('Failed to fetch transactions:', error);
+      setLastUpdated(new Date());
+    } catch (err) {
+      console.error('Failed to fetch transactions:', err);
+      setError('Failed to load transactions. Please try again.');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchTransactions();
+    const interval = setInterval(fetchTransactions, 30000);
+    return () => clearInterval(interval);
+  }, [fetchTransactions]);
+
+  useEffect(() => {
+    applyFiltersAndSort();
+  }, [transactions, searchTerm, filterNetwork, sortField, sortOrder]);
 
   const applyFiltersAndSort = () => {
     let filtered = [...transactions];
@@ -91,6 +111,11 @@ export default function TransactionsPage() {
     }
   };
 
+  const handleRefresh = () => {
+    setIsLoading(true);
+    fetchTransactions();
+  };
+
   const exportCSV = () => {
     const csv = Papa.unparse(
       filteredTransactions.map((tx) => ({
@@ -105,7 +130,7 @@ export default function TransactionsPage() {
         'Profit (₦)': tx.profit || '-',
         Status: tx.status,
         'Reference': tx.reference,
-        'Date': new Date(tx.created_at).toLocaleString(),
+        'Date': formatDate(tx.created_at),
       }))
     );
 
@@ -118,33 +143,27 @@ export default function TransactionsPage() {
   const SortHeader = ({ field, label }: { field: SortField; label: string }) => (
     <th
       onClick={() => handleSort(field)}
-      className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+      className="table-header cursor-pointer hover:bg-[var(--color-gray-100)] transition-colors"
     >
       <div className="flex items-center gap-2">
         {label}
-        {sortField === field &&
-          (sortOrder === 'asc' ? (
-            <ChevronUp size={16} />
-          ) : (
-            <ChevronDown size={16} />
-          ))}
+        {sortField === field && (
+          sortOrder === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />
+        )}
       </div>
     </th>
   );
 
-  const getStatusBadge = (status: string) => {
-    const colors = {
-      success: 'bg-green-100 text-green-800',
-      failed: 'bg-red-100 text-red-800',
-      pending: 'bg-yellow-100 text-yellow-800',
-    };
-    return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-800';
-  };
-
-  if (isLoading) {
+  if (isLoading && !lastUpdated) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg text-gray-600">Loading transactions...</div>
+      <div className="space-y-6">
+        <PageHeader
+          title="Transactions"
+          description="Track all user purchases and transactions"
+        />
+        <Card>
+          <TableSkeleton rows={10} columns={9} />
+        </Card>
       </div>
     );
   }
@@ -152,115 +171,105 @@ export default function TransactionsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Transactions</h1>
-        <p className="text-gray-600 mt-2">Track all user purchases and transactions</p>
+      <div className="flex items-center gap-4">
+        <BackButton />
+        <PageHeader
+          title="Transactions"
+          description="Track all user purchases and transactions"
+        >
+          <RefreshButton 
+            onClick={handleRefresh} 
+            isLoading={isLoading}
+            lastUpdated={lastUpdated}
+          />
+        </PageHeader>
       </div>
+
+      {/* Error Alert */}
+      {error && (
+        <Alert variant="danger" title="Error" onDismiss={() => setError(null)}>
+          {error}
+        </Alert>
+      )}
 
       {/* Controls */}
-      <div className="bg-white rounded-lg shadow p-4 space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {/* Search */}
-          <div className="relative">
-            <Search size={18} className="absolute left-3 top-3 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search by phone, reference..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+      <FilterBar>
+        <SearchInput
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search by phone, reference..."
+          className="md:w-64"
+        />
 
-          {/* Network Filter */}
-          <select
-            value={filterNetwork}
-            onChange={(e) => setFilterNetwork(e.target.value as FilterNetwork)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="all">All Networks</option>
-            <option value="MTN">MTN</option>
-            <option value="GLO">GLO</option>
-          </select>
+        <Select
+          value={filterNetwork}
+          onChange={(e) => setFilterNetwork(e.target.value as FilterNetwork)}
+          className="md:w-48"
+        >
+          {NETWORK_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </Select>
 
-          {/* Export */}
-          <button
-            onClick={exportCSV}
-            className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <Download size={18} />
-            Export CSV
-          </button>
-
-          {/* Results */}
-          <div className="flex items-center justify-end px-4 py-2 bg-gray-50 rounded-lg">
-            <span className="text-sm text-gray-600">
-              {filteredTransactions.length} result{filteredTransactions.length !== 1 ? 's' : ''}
-            </span>
-          </div>
-        </div>
-      </div>
+        <ExportButton onClick={exportCSV} label="Export CSV" />
+        
+        <ResultsCount 
+          count={filteredTransactions.length} 
+          label="transaction"
+        />
+      </FilterBar>
 
       {/* Table */}
-      <div className="bg-white rounded-lg shadow overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b">
-            <tr>
-              <SortHeader field="created_at" label="Date" />
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                Mobile Number
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                Network
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                Plan
-              </th>
-              <SortHeader field="amount" label="Amount (₦)" />
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                Cost (₦)
-              </th>
-              <SortHeader field="profit" label="Profit (₦)" />
-              <SortHeader field="status" label="Status" />
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                Reference
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y">
-            {filteredTransactions.map((tx) => (
-              <tr key={tx.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {new Date(tx.created_at).toLocaleString()}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{tx.mobile_number}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{tx.network_name}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{tx.data_capacity}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
-                  ₦{(tx.sell_price || tx.amount).toLocaleString()}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {tx.cost_price ? `₦${tx.cost_price.toLocaleString()}` : '-'}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
-                  {tx.profit ? `₦${tx.profit.toLocaleString()}` : '-'}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(tx.status)}`}>
-                    {tx.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{tx.reference}</td>
+      <Card noPadding>
+        <div className="overflow-x-auto">
+          <table className="table">
+            <thead>
+              <tr>
+                <SortHeader field="created_at" label="Date" />
+                <th className="table-header">Mobile Number</th>
+                <th className="table-header">Network</th>
+                <th className="table-header">Plan</th>
+                <SortHeader field="amount" label="Amount (₦)" />
+                <th className="table-header">Cost (₦)</th>
+                <SortHeader field="profit" label="Profit (₦)" />
+                <SortHeader field="status" label="Status" />
+                <th className="table-header">Reference</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {filteredTransactions.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-gray-600">No transactions found</p>
+            </thead>
+            <tbody>
+              {filteredTransactions.map((tx) => (
+                <tr key={tx.id} className="table-row">
+                  <DateCell date={tx.created_at} />
+                  <td className="table-cell">{tx.mobile_number}</td>
+                  <td className="table-cell">
+                    <span className="font-medium">{tx.network_name}</span>
+                  </td>
+                  <td className="table-cell">{tx.data_capacity || '-'}</td>
+                  <CurrencyCell amount={tx.sell_price || tx.amount} />
+                  <td className="table-cell text-[var(--color-text-secondary)]">
+                    {tx.cost_price ? formatCurrency(tx.cost_price) : '-'}
+                  </td>
+                  <td className="table-cell font-medium text-[var(--color-success)]">
+                    {tx.profit ? formatCurrency(tx.profit) : '-'}
+                  </td>
+                  <StatusCell status={tx.status} />
+                  <td className="table-cell text-[var(--color-text-muted)] text-xs font-mono">
+                    {tx.reference}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
+      </Card>
+
+      {/* Empty State */}
+      {filteredTransactions.length === 0 && !isLoading && (
+        <EmptyState
+          icon="📊"
+          title="No transactions found"
+          description="Try adjusting your search or filter criteria"
+        />
       )}
     </div>
   );
